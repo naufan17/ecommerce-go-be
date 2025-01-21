@@ -4,6 +4,7 @@ import (
 	"ecommerce-go-be/internal/dtos"
 	"ecommerce-go-be/internal/models"
 	"ecommerce-go-be/internal/repositories"
+	"errors"
 	"strconv"
 )
 
@@ -11,7 +12,7 @@ func GetCategories() ([]dtos.CategoryDTO, error) {
 	categories, err := repositories.GetCategories()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New("not found")
 	}
 
 	var categoryDTOs []dtos.CategoryDTO
@@ -27,53 +28,49 @@ func GetCategory(id string) (dtos.CategoryDTO, error) {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return dtos.CategoryDTO{}, err
+		return dtos.CategoryDTO{}, errors.New("bad request")
 	}
 
 	category, err := repositories.GetCategoryByID(intID)
 
 	if err != nil {
-		return dtos.CategoryDTO{}, err
+		return dtos.CategoryDTO{}, errors.New("not found")
 	}
 
 	return dtos.ToCategoryDTO(category), nil
 }
 
 func CreateCategory(category models.Category) (models.Category, error) {
-	createdCategory, err := repositories.CreateCategory(category)
-
-	if err != nil {
-		return models.Category{}, err
+	if _, err := repositories.CreateCategory(category); err != nil {
+		return category, errors.New("internal server error")
 	}
 
-	return createdCategory, nil
+	return category, nil
 }
 
 func UpdateCategory(category models.Category, id string) (models.Category, error) {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return models.Category{}, err
+		return category, errors.New("bad request")
 	}
 
-	updatedCategory, err := repositories.UpdateCategory(category, intID)
-
-	if err != nil {
-		return models.Category{}, err
+	if _, err := repositories.UpdateCategory(category, intID); err != nil {
+		return category, errors.New("internal server error")
 	}
 
-	return updatedCategory, nil
+	return category, nil
 }
 
 func DeleteCategory(id string) error {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return err
+		return errors.New("bad request")
 	}
 
 	if err := repositories.DeleteCategory(intID); err != nil {
-		return err
+		return errors.New("not found")
 	}
 
 	return nil

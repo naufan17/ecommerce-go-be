@@ -4,6 +4,7 @@ import (
 	"ecommerce-go-be/internal/dtos"
 	"ecommerce-go-be/internal/models"
 	"ecommerce-go-be/internal/repositories"
+	"errors"
 	"strconv"
 )
 
@@ -11,7 +12,7 @@ func GetProducts() ([]dtos.ProductDTO, error) {
 	products, err := repositories.GetProducts()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.New("not found")
 	}
 
 	var productDTOs []dtos.ProductDTO
@@ -27,53 +28,49 @@ func GetProduct(id string) (dtos.ProductDTO, error) {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return dtos.ProductDTO{}, err
+		return dtos.ProductDTO{}, errors.New("bad request")
 	}
 
 	product, err := repositories.GetProductByID(intID)
 
 	if err != nil {
-		return dtos.ProductDTO{}, err
+		return dtos.ProductDTO{}, errors.New("not found")
 	}
 
 	return dtos.ToProductDTO(product), nil
 }
 
 func CreateProduct(product models.Product) (models.Product, error) {
-	createdProduct, err := repositories.CreateProduct(product)
-
-	if err != nil {
-		return models.Product{}, err
+	if _, err := repositories.CreateProduct(product); err != nil {
+		return product, errors.New("internal server error")
 	}
 
-	return createdProduct, nil
+	return product, nil
 }
 
 func UpdateProduct(product models.Product, id string) (models.Product, error) {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return models.Product{}, err
+		return product, errors.New("bad request")
 	}
 
-	updatedProduct, err := repositories.UpdateProduct(product, intID)
-
-	if err != nil {
-		return models.Product{}, err
+	if _, err := repositories.UpdateProduct(product, intID); err != nil {
+		return product, errors.New("internal server error")
 	}
 
-	return updatedProduct, nil
+	return product, nil
 }
 
 func DeleteProduct(id string) error {
 	intID, err := strconv.Atoi(id)
 
 	if err != nil {
-		return err
+		return errors.New("bad request")
 	}
 
 	if err := repositories.DeleteProduct(intID); err != nil {
-		return err
+		return errors.New("not found")
 	}
 
 	return nil

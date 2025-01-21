@@ -27,7 +27,7 @@ func GetCategoryByID(id int) (models.Category, error) {
 
 func CreateCategory(category models.Category) (models.Category, error) {
 	if err := utils.DB.Create(&category).Error; err != nil {
-		return category, err
+		return models.Category{}, err
 	}
 
 	return category, nil
@@ -35,7 +35,7 @@ func CreateCategory(category models.Category) (models.Category, error) {
 
 func UpdateCategory(category models.Category, id int) (models.Category, error) {
 	if err := utils.DB.Where("id = ?", id).Updates(&category).Error; err != nil {
-		return category, err
+		return models.Category{}, err
 	}
 
 	return category, nil

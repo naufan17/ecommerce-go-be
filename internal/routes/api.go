@@ -26,8 +26,8 @@ func SetupRouter(router *gin.Engine) {
 
 	api := router.Group("/api/v1")
 	{
-		// api.POST("/auth/register", controllers.Register)
-		// api.POST("/auth/login", controllers.Login)
+		api.POST("/auth/register", controllers.Register)
+		api.POST("/auth/login", controllers.Login)
 
 		api.GET("/categories", controllers.GetCategories)
 		api.GET("/categories/:id", controllers.GetCategory)

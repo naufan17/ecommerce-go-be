@@ -12,6 +12,10 @@ func GetProducts(c *gin.Context) {
 	products, err := services.GetProducts()
 
 	if err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Products not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -24,6 +28,13 @@ func GetProduct(c *gin.Context) {
 	product, err := services.GetProduct(id)
 
 	if err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Product not found"})
+			return
+		} else if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid product ID"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -39,7 +50,13 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	if _, err := services.CreateProduct(product); err != nil {
+	product, err := services.CreateProduct(product)
+
+	if err != nil {
+		if err.Error() == "internal server error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create product"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -56,7 +73,16 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	if _, err := services.UpdateProduct(product, id); err != nil {
+	product, err := services.UpdateProduct(product, id)
+
+	if err != nil {
+		if err.Error() == "internal server error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update product"})
+			return
+		} else if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request payload"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -68,6 +94,13 @@ func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := services.DeleteProduct(id); err != nil {
+		if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid product ID"})
+			return
+		} else if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Product not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

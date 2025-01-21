@@ -12,6 +12,10 @@ func GetCategories(c *gin.Context) {
 	categories, err := services.GetCategories()
 
 	if err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Categories not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -24,6 +28,13 @@ func GetCategory(c *gin.Context) {
 	category, err := services.GetCategory(id)
 
 	if err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
+			return
+		} else if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid category ID"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -39,7 +50,13 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 
-	if _, err := services.CreateCategory(category); err != nil {
+	category, err := services.CreateCategory(category)
+
+	if err != nil {
+		if err.Error() == "internal server error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create category"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -52,11 +69,27 @@ func UpdateCategory(c *gin.Context) {
 	var category models.Category
 
 	if err := c.ShouldBindJSON(&category); err != nil {
+		if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request payload"})
+			return
+		} else if err.Error() == "internal server error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update category"})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if _, err := services.UpdateCategory(category, id); err != nil {
+	category, err := services.UpdateCategory(category, id)
+
+	if err != nil {
+		if err.Error() == "internal server error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update category"})
+			return
+		} else if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid category ID"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -68,6 +101,13 @@ func DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := services.DeleteCategory(id); err != nil {
+		if err.Error() == "not found" {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Category not found"})
+			return
+		} else if err.Error() == "bad request" {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid category ID"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
