@@ -2,6 +2,7 @@ package routes
 
 import (
 	"ecommerce-go-be/internal/controllers"
+	"ecommerce-go-be/internal/middlewares"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -31,14 +32,14 @@ func SetupRouter(router *gin.Engine) {
 
 		api.GET("/categories", controllers.GetCategories)
 		api.GET("/categories/:id", controllers.GetCategory)
-		api.POST("/categories", controllers.CreateCategory)
-		api.PUT("/categories/:id", controllers.UpdateCategory)
-		api.DELETE("/categories/:id", controllers.DeleteCategory)
+		api.POST("/categories", middlewares.AuthenticationMiddleware, controllers.CreateCategory)
+		api.PUT("/categories/:id", middlewares.AuthenticationMiddleware, controllers.UpdateCategory)
+		api.DELETE("/categories/:id", middlewares.AuthenticationMiddleware, controllers.DeleteCategory)
 
 		api.GET("/products", controllers.GetProducts)
 		api.GET("/products/:id", controllers.GetProduct)
-		api.POST("/products", controllers.CreateProduct)
-		api.PUT("/products/:id", controllers.UpdateProduct)
-		api.DELETE("/products/:id", controllers.DeleteProduct)
+		api.POST("/products", middlewares.AuthenticationMiddleware, controllers.CreateProduct)
+		api.PUT("/products/:id", middlewares.AuthenticationMiddleware, controllers.UpdateProduct)
+		api.DELETE("/products/:id", middlewares.AuthenticationMiddleware, controllers.DeleteProduct)
 	}
 }

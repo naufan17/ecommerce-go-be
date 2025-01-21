@@ -49,7 +49,7 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	}
 
 	if !token.Valid {
-		return nil, err
+		return nil, jwt.ErrSignatureInvalid
 	}
 
 	return claims, nil
