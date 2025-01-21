@@ -1,8 +1,6 @@
 package main
 
 import (
-	"ecommerce-go-be/database/seeders"
-	"ecommerce-go-be/internal/config"
 	"ecommerce-go-be/internal/routes"
 
 	"github.com/gin-gonic/gin"
@@ -10,13 +8,13 @@ import (
 
 func main() {
 	// Initialize the database
-	db := config.ConnectDB()
+	// db := config.ConnectDB()
 
 	// Migrate the database
-	config.MigrateDB(db)
+	// config.MigrateDB(db)
 
 	// Seed the database
-	seeders.SeedAll(db)
+	// seeders.SeedAll(db)
 
 	// Initialize the router
 	router := gin.Default()

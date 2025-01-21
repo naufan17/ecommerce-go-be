@@ -33,8 +33,8 @@ func CreateCategory(category models.Category) (models.Category, error) {
 	return category, nil
 }
 
-func UpdateCategory(category models.Category) (models.Category, error) {
-	if err := utils.DB.Save(&category).Error; err != nil {
+func UpdateCategory(category models.Category, id int) (models.Category, error) {
+	if err := utils.DB.Where("id = ?", id).Updates(&category).Error; err != nil {
 		return category, err
 	}
 

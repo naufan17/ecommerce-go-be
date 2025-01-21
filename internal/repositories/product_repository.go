@@ -8,7 +8,7 @@ import (
 func GetProducts() ([]models.Product, error) {
 	var products []models.Product
 
-	if err := utils.DB.Select("id", "name", "description", "price", "category_id").Find(&products).Error; err != nil {
+	if err := utils.DB.Preload("Category").Select("id", "name", "description", "price", "quantity").Find(&products).Error; err != nil {
 		return nil, err
 	}
 
@@ -18,7 +18,7 @@ func GetProducts() ([]models.Product, error) {
 func GetProductByID(id int) (models.Product, error) {
 	var product models.Product
 
-	if err := utils.DB.Select("id", "name", "description", "price", "category_id").First(&product, id).Error; err != nil {
+	if err := utils.DB.Preload("Category").Select("id", "name", "description", "price", "quantity", "category_id").First(&product, id).Error; err != nil {
 		return product, err
 	}
 
@@ -33,8 +33,8 @@ func CreateProduct(product models.Product) (models.Product, error) {
 	return product, nil
 }
 
-func UpdateProduct(product models.Product) (models.Product, error) {
-	if err := utils.DB.Save(&product).Error; err != nil {
+func UpdateProduct(product models.Product, id int) (models.Product, error) {
+	if err := utils.DB.Where("id = ?", id).Updates(&product).Error; err != nil {
 		return product, err
 	}
 

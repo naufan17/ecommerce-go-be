@@ -16,7 +16,7 @@ func GetProducts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, gin.H{"data": products})
 }
 
 func GetProduct(c *gin.Context) {
@@ -28,7 +28,7 @@ func GetProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, product)
+	c.JSON(http.StatusOK, gin.H{"data": product})
 }
 
 func CreateProduct(c *gin.Context) {
@@ -48,7 +48,7 @@ func CreateProduct(c *gin.Context) {
 }
 
 func UpdateProduct(c *gin.Context) {
-	// id := c.Param("id")
+	id := c.Param("id")
 	var product models.Product
 
 	if err := c.ShouldBindJSON(&product); err != nil {
@@ -56,7 +56,7 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	if _, err := services.UpdateProduct(product); err != nil {
+	if _, err := services.UpdateProduct(product, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -66,9 +66,8 @@ func UpdateProduct(c *gin.Context) {
 
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
-	err := services.DeleteProduct(id)
 
-	if err != nil {
+	if err := services.DeleteProduct(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

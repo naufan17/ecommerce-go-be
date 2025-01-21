@@ -16,7 +16,7 @@ func GetCategories(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, categories)
+	c.JSON(http.StatusOK, gin.H{"data": categories})
 }
 
 func GetCategory(c *gin.Context) {
@@ -28,7 +28,7 @@ func GetCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, category)
+	c.JSON(http.StatusOK, gin.H{"data": category})
 }
 
 func CreateCategory(c *gin.Context) {
@@ -48,7 +48,7 @@ func CreateCategory(c *gin.Context) {
 }
 
 func UpdateCategory(c *gin.Context) {
-	// id := c.Param("id")
+	id := c.Param("id")
 	var category models.Category
 
 	if err := c.ShouldBindJSON(&category); err != nil {
@@ -56,7 +56,7 @@ func UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	if _, err := services.UpdateCategory(category); err != nil {
+	if _, err := services.UpdateCategory(category, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -66,6 +66,7 @@ func UpdateCategory(c *gin.Context) {
 
 func DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
+
 	if err := services.DeleteCategory(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

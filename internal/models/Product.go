@@ -8,7 +8,7 @@ import (
 
 type Product struct {
 	gorm.Model
-	ProductID   uint      `json:"product_id" gorm:"type:primaryKey;autoIncrement;not null"`
+	ID          uint      `json:"id" gorm:"type:primaryKey;autoIncrement;not null"`
 	Name        string    `json:"name" gorm:"type:varchar(100);not null"`
 	Description string    `json:"description" gorm:"type:text;not null"`
 	Price       float64   `json:"price" gorm:"type:decimal;not null"`
@@ -18,7 +18,7 @@ type Product struct {
 	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime;not null"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime;not null"`
 
-	Category Category `gorm:"foreignKey:CategoryID;references:CategoryID"`
+	Category Category `json:"category" gorm:"foreignKey:CategoryID;references:ID"`
 
-	User User `gorm:"foreignKey:UserID;references:ProductID"`
+	User User `json:"user" gorm:"foreignKey:UserID;references:ID"`
 }
